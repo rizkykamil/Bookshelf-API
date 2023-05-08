@@ -1,11 +1,16 @@
 const {
-  v4: uuidv4
+  v4: uuidv4,
 } = require('uuid');
 // Variabel untuk menyimpan data buku
-let books = [];
+const books = [];
 
 
-// Fungsi untuk menambahkan buku
+/**
+ * Handles the request to add a book.
+ * @param {Object} request - The request object.
+ * @param {Object} h - The response toolkit.
+ * @return {Object} The response object.
+ */
 function addBookHandler(request, h) {
   try {
     const {
@@ -16,7 +21,7 @@ function addBookHandler(request, h) {
       publisher,
       pageCount,
       readPage,
-      reading
+      reading,
     } = request.payload;
     const now = new Date().toISOString();
 
@@ -24,7 +29,7 @@ function addBookHandler(request, h) {
     if (!name) {
       return h.response({
         status: 'fail',
-        message: 'Gagal menambahkan buku. Mohon isi nama buku'
+        message: 'Gagal menambahkan buku. Mohon isi nama buku',
       }).code(400);
     }
 
@@ -32,7 +37,8 @@ function addBookHandler(request, h) {
     if (readPage > pageCount) {
       return h.response({
         status: 'fail',
-        message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount'
+        message: 'Gagal menambahkan buku.' +
+         'readPage tidak boleh lebih besar dari pageCount',
       }).code(400);
     }
 
@@ -49,39 +55,45 @@ function addBookHandler(request, h) {
       reading,
       finished: pageCount === readPage,
       insertedAt: now,
-      updatedAt: now
+      updatedAt: now,
     };
     books.push(book);
     return h.response({
       status: 'success',
       message: 'Buku berhasil ditambahkan',
       data: {
-        bookId: uuid
-      }
+        bookId: uuid,
+      },
     }).code(201);
   } catch (error) {
     console.log('Error adding book:', error);
     return h.response({
-      message: 'Failed to add book'
+      message: 'Failed to add book',
     }).code(500);
   }
 }
 
-
-// Fungsi untuk menampilkan semua buku
+/**
+ * Handles the request to get all books.
+ * @param {Object} request - The request object.
+ * @param {Object} h - The response toolkit.
+ * @return {Object} The response object.
+ */
 function getAllBooksHandler(request, h) {
   const {
     publisher,
     sortBy,
     reading,
-    finished
+    finished,
   } = request.query;
 
   try {
     let filteredBooks = [...books];
 
     if (publisher) {
-      filteredBooks = filteredBooks.filter((book) => book.publisher === publisher);
+      filteredBooks = filteredBooks.filter((book) =>
+        book.publisher === publisher,
+      );
     }
 
     if (reading !== undefined) {
